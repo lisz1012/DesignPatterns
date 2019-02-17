@@ -1,6 +1,6 @@
 package observer;
 
-class Child {
+class Child implements Runnable {
 
     private boolean wakenUp = false;
 
@@ -11,6 +11,16 @@ class Child {
     void wakeUp(){
         wakenUp = true;
     }
+
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        wakeUp();
+    }
 }
 
 class Dad implements Runnable {
@@ -18,6 +28,7 @@ class Dad implements Runnable {
     public Dad (Child c) {
         this.c = c;
     }
+
     @Override
     public void run() {
         while (!c.isWakenUp()) {
@@ -40,6 +51,7 @@ public class Main {
 
     public static void main(String[] args) {
         Child c = new Child();
+        new Thread(c).start();
         new Thread(new Dad(c)).start();
     }
 }

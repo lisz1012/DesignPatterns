@@ -85,20 +85,22 @@ class GrandFather implements WakenUpListener {
 public class Main {
 
     public static void main(String[] args) {
+        Child c = new Child();
         Properties props = new Properties();
         try {
             props.load(Main.class.getClassLoader().getResourceAsStream("observer/observer.properties"));
             String observers[] = props.getProperty("observers").split(",");
-            Arrays.stream(observers).forEach(System.out::println);
-        } catch (IOException e) {
+            for (String observer : observers) {
+                c.addWakenUpListener((WakenUpListener) Class.forName(observer).newInstance());
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
             e.printStackTrace();
         }
 
-        WakenUpListener l1 = new Dad();
-        WakenUpListener l2 = new GrandFather();
-        Child c = new Child();
-        c.addWakenUpListener(l1);
-        c.addWakenUpListener(l2);
         new Thread(c).start();
     }
 }

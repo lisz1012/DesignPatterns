@@ -1,7 +1,10 @@
 package observer;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 class WakenUpEvent {
     private long time;
@@ -82,6 +85,15 @@ class GrandFather implements WakenUpListener {
 public class Main {
 
     public static void main(String[] args) {
+        Properties props = new Properties();
+        try {
+            props.load(Main.class.getClassLoader().getResourceAsStream("observer/observer.properties"));
+            String observers[] = props.getProperty("observers").split(",");
+            Arrays.stream(observers).forEach(System.out::println);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         WakenUpListener l1 = new Dad();
         WakenUpListener l2 = new GrandFather();
         Child c = new Child();

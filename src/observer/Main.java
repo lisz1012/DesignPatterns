@@ -1,8 +1,13 @@
 package observer;
 
 class Child implements Runnable {
+    private Dad d;
 
     private boolean wakenUp = false;
+
+    public Child(Dad d) {
+        this.d = d;
+    }
 
     public boolean isWakenUp() {
         return wakenUp;
@@ -10,6 +15,7 @@ class Child implements Runnable {
 
     void wakeUp(){
         wakenUp = true;
+        d.feed(this);
     }
 
     @Override
@@ -23,26 +29,8 @@ class Child implements Runnable {
     }
 }
 
-class Dad implements Runnable {
-    Child c;
-    public Dad (Child c) {
-        this.c = c;
-    }
-
-    @Override
-    public void run() {
-        while (!c.isWakenUp()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        feed(c);
-    }
-
-    private void feed(Child c) {
+class Dad {
+    public void feed(Child c) {
         System.out.println("Feeding " + c);
     }
 }
@@ -50,8 +38,8 @@ class Dad implements Runnable {
 public class Main {
 
     public static void main(String[] args) {
-        Child c = new Child();
+        Dad d = new Dad();
+        Child c = new Child(d);
         new Thread(c).start();
-        new Thread(new Dad(c)).start();
     }
 }

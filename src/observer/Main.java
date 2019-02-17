@@ -1,5 +1,8 @@
 package observer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class WakenUpEvent {
     private long time;
     private String loc;
@@ -37,21 +40,15 @@ class WakenUpEvent {
 }
 
 class Child implements Runnable {
-    private Dad d;
+    private List<WakenUpListener> listeners = new ArrayList<>();
 
-    private boolean wakenUp = false;
-
-    public Child(Dad d) {
-        this.d = d;
-    }
-
-    public boolean isWakenUp() {
-        return wakenUp;
+    public void addWakenUpListener(WakenUpListener l) {
+        listeners.add(l);
     }
 
     void wakeUp(){
-        wakenUp = true;
-        d.actionPerformed(new WakenUpEvent(System.currentTimeMillis(), "bed", this));
+        WakenUpEvent e = new WakenUpEvent(System.currentTimeMillis(), "bed", this);
+        listeners.forEach(x -> x.actionPerformed(e));
     }
 
     @Override
@@ -65,18 +62,31 @@ class Child implements Runnable {
     }
 }
 
-class Dad {
+class Dad implements WakenUpListener {
+    @Override
     public void actionPerformed(WakenUpEvent e) {
         System.out.println("Wake up at " + e.getLoc());
         System.out.println("Feeding " + e.getSource());
     }
 }
 
+
+class GrandFather implements WakenUpListener {
+    @Override
+    public void actionPerformed(WakenUpEvent e) {
+        System.out.println("Wake up at " + e.getTime());
+        System.out.println("Hugging " + e.getSource());
+    }
+}
+
 public class Main {
 
     public static void main(String[] args) {
-        Dad d = new Dad();
-        Child c = new Child(d);
+        WakenUpListener l1 = new Dad();
+        WakenUpListener l2 = new GrandFather();
+        Child c = new Child();
+        c.addWakenUpListener(l1);
+        c.addWakenUpListener(l2);
         new Thread(c).start();
     }
 }

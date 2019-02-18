@@ -87,7 +87,7 @@ public class Main {
     public static void main(String[] args) {
         Child c = new Child();
         try {
-            String observers[] = PropertyManager.getProperty("observer/observer.properties", "observers").split(",");
+            String observers[] = PropertyManager.getProperty("observers").split(",");
             for (String observer : observers) {
                 c.addWakenUpListener((WakenUpListener) Class.forName(observer).newInstance());
             }
@@ -104,13 +104,15 @@ public class Main {
 }
 
 class PropertyManager {
-    public static String getProperty(String filename, String key) {
-        Properties props = new Properties();
+    private static final Properties PROPS = new Properties();
+    static {
         try {
-            props.load(Main.class.getClassLoader().getResourceAsStream(filename));
+            PROPS.load(Main.class.getClassLoader().getResourceAsStream("observer/observer.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return props.getProperty(key);
+    }
+    public static String getProperty(String key) {
+        return PROPS.getProperty(key);
     }
 }

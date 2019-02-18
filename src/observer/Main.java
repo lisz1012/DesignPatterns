@@ -86,14 +86,12 @@ public class Main {
 
     public static void main(String[] args) {
         Child c = new Child();
-        Properties props = new Properties();
         try {
-            props.load(Main.class.getClassLoader().getResourceAsStream("observer/observer.properties"));
-            String observers[] = props.getProperty("observers").split(",");
+            String observers[] = PropertyManager.getProperty("observer/observer.properties", "observers").split(",");
             for (String observer : observers) {
                 c.addWakenUpListener((WakenUpListener) Class.forName(observer).newInstance());
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -102,5 +100,17 @@ public class Main {
         }
 
         new Thread(c).start();
+    }
+}
+
+class PropertyManager {
+    public static String getProperty(String filename, String key) {
+        Properties props = new Properties();
+        try {
+            props.load(Main.class.getClassLoader().getResourceAsStream(filename));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return props.getProperty(key);
     }
 }
